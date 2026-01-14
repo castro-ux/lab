@@ -3,7 +3,7 @@
 2. Initialize Git repo (git init)          
 3. Create commands.md file
 4. Execute a commit message (git add . \ git commit -m "message" 
-5. Create GitHub repo, "linux-notes" (gh create linux-notes --public --source=. --remote=origin --push) 
+5. Create GitHub repo, "linux-notes" (gh create lab --public --source=. --remote=origin --push) 
 6. Push local repo to GitHub
 7. Create a branch, "add-vim-commands" (git switch -c add-vim-commands)
 8. Edit commands.md and add Vim section
