@@ -1,0 +1,53 @@
+#!/bin/bash
+
+folder=$HOME/obsidian/
+FONT="Monospace:size=13"
+TERMINAL="alacritty"
+
+# 1. SELECT OR TYPE CATEGORY
+choice=$(cd "$folder" && find . -mindepth 1 -type d \
+    -not -path '*/.*' \
+    -regextype posix-extended \
+    -not -regex ".*(0_input|1_output|1_output/neovim|3_weekly_goals/2025|4_monthly_goals/2025)" \
+    -not -regex ".*/3_weekly_goals$" \
+    -not -regex ".*/4_monthly_goals$" | \
+    sort | dmenu -fn "$FONT" -l 25 -i -p "Select Category: ") || exit 0
+
+
+# 2. RESOLVE DIRECTORY
+dir="${folder}${choice}"
+
+# Check if the directory exists; if not, exit
+if [ ! -d "$dir" ]; then
+    exit 1
+fi
+
+# Ensure it ends with a slash
+[[ "$dir" != */ ]] && dir="$dir/"
+
+
+# 3. NAME THE NEW NOTE
+name=$(echo "" | dmenu -fn "$FONT" -p "New Note Name: " <&-) || exit 0
+: "${name:=$(date +%F_%H-%M)}"
+
+full_path="${dir}${name}.md"
+
+# Only add frontmatter if the file doesn't exist or is empty
+if [ ! -s "$full_path" ]; then
+cat <<EOF > "$full_path"
+---
+title: ${name}
+date: $(date +'%Y-%m-%d %H:%M')
+tag: [ ]
+---
+
+# ${name}
+
+EOF
+fi
+
+# 4. EXECUTE
+echo "Opening: ${full_path#"$folder"}"
+
+# Launch terminal and editor
+setsid -f "$TERMINAL" -e nvim "$full_path" >/dev/null
